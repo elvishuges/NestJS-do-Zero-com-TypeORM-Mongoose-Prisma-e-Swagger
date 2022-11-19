@@ -14,22 +14,21 @@ import { Tag } from './entities/tag.entity';
 
 @Injectable()
 export class CoursesService {
-  constructor(
-    @Inject('COURSES_REPOSITORY')
-    private readonly courseRepository: Repository<Course>,
+  // tirando do construtor para pode chamar nos testes
+  @Inject('COURSES_REPOSITORY')
+  private courseRepository: Repository<Course>;
 
-    @Inject('TAGS_REPOSITORY')
-    private readonly tagRepository: Repository<Tag>,
-  ) {}
+  @Inject('TAGS_REPOSITORY')
+  private tagRepository: Repository<Tag>;
 
   findAll() {
     return this.courseRepository.find({ relations: ['tags'] });
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     const course = await this.courseRepository.findOne({
-      where: { id: +id },
-      relations: ['user'],
+      where: { id },
+      relations: ['tags'],
     });
 
     if (!course) {
@@ -71,8 +70,8 @@ export class CoursesService {
     return this.courseRepository.save(course);
   }
 
-  async remove(id: string) {
-    const course = await this.courseRepository.findOne({ where: { id: +id } });
+  async remove(id: number) {
+    const course = await this.courseRepository.findOne({ where: { id } });
     if (!course) {
       throw new NotFoundException(`Course ID ${id} not found`);
     }
